@@ -33,8 +33,3 @@ channel.basic_consume(on_request, queue='queue_run_container')
 
 print(" [x] Awaiting RPC requests")
 channel.start_consuming()
-
-"""
-from server import server_run_container
-
-"""
