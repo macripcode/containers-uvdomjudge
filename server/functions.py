@@ -4,6 +4,11 @@ import json
 import MySQLdb
 
 
+def is_running_container(name_container):
+    state_container = os.popen('docker inspect --format=\'{{.State.Running}}\' ' + name_container).read().replace(
+        '\n', '')
+    return state_container
+
 def run_container_course(container):
     print("dato de container")
     print(type(container))

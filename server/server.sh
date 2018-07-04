@@ -6,6 +6,7 @@
 ./server_set_pass_container.py &
 ./server_delete_period_containers.py &
 ./server_delete_period_containers.py &
+./server_public_run_container.py &
 
 
 
