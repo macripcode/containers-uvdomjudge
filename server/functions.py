@@ -3,12 +3,13 @@ import os
 import json
 import MySQLdb
 
-
+#Check if the container with name_container is actually up
 def is_running_container(name_container):
     state_container = os.popen('docker inspect --format=\'{{.State.Running}}\' ' + name_container).read().replace(
         '\n', '')
     return state_container
 
+#this create a container and execute
 def run_container_course(container):
     print("dato de container")
     print(type(container))
@@ -25,7 +26,7 @@ def run_container_course(container):
 
     return response
 
-
+#get the data of container
 def data_container(name_container):
 
 
@@ -76,7 +77,7 @@ def data_container(name_container):
 
 
 
-
+#Insert a new student in the bd of domjudge inside of container, if this container is up
 def enroll_course(data):
 
     # datos para poner generales
@@ -111,7 +112,7 @@ def enroll_course(data):
     
     return '201'
 
-
+#insert the data of profesor an set up like admin of domjudge
 def set_pass_admin_container(data):
     print("el lazo 6")
 
@@ -153,7 +154,7 @@ def set_pass_admin_container(data):
 
     return '201'
 
-
+#delete all containers from period
 def delete_containers_period(id_period):
 
     #stop all containers in that period
