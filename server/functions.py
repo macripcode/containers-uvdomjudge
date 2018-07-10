@@ -3,6 +3,57 @@ import os
 import json
 import MySQLdb
 
+#Cheeck de current port 80 from a running container
+def get_port_80(name_container):
+    response = os.popen(
+        'docker inspect --format=\'{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}\' ' + name_container).read().replace(
+        '\n', '')
+
+    return response
+
+#Cheeck de current port 3306 from a running container
+def get_port_3306(name_container):
+    response = os.popen(
+        'docker inspect --format=\'{{(index (index .NetworkSettings.Ports "3306/tcp") 0).HostPort}}\' ' + name_container).read().replace(
+        '\n', '')
+
+    return response
+
+
+#Stop container with name_container
+def stop_container(name_container):
+    response = os.popen(
+        'docker stop ' + name_container).read().replace(
+        '\n', '')
+    if response == name_container:
+        return '200'
+    return '500'
+#hasta aqui ya hice el server
+
+#Start container with name_container
+def start_container(name_container):
+    response = os.popen(
+        'docker start ' + name_container).read().replace(
+        '\n', '')
+    if response == name_container:
+        return '200'
+    return '500'
+
+#Remove container with name_container
+def remove_container(name_container):
+    response = os.popen(
+        'docker rm ' + name_container).read().replace(
+        '\n', '')
+    if response == name_container:
+        return '200'
+    return '500'
+
+#Return logs from container with name_container
+def logs_container(name_container):
+    response = os.popen(
+        'docker logs ' + name_container).read()
+    return response
+
 #Check if the container with name_container is actually up
 def is_running_container(name_container):
     state_container = os.popen('docker inspect --format=\'{{.State.Running}}\' ' + name_container).read().replace(
