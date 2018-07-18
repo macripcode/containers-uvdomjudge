@@ -159,6 +159,9 @@ def enroll_course(data):
         conn.close()
 
     except MySQLdb.Error as e:
+        file = open('testfile.txt', 'w')
+        file.write(e)
+        file.close()
         return '500'
     
     return '201'
@@ -216,3 +219,22 @@ def delete_containers_period(id_period):
     os.system("docker volume rm $(docker volume ls -f name=" + str(id_period) + " -q)")
 
     return '200'
+
+
+def open_database(name_container):
+    user='root'
+    password='temprootpass'
+    host='localhost'
+    db='domjudge'
+
+    command1 = "docker exec -d "+name_container+" sh -c \"sed -i '/bind/s/^/#/g' /etc/mysql/my.cnf\""
+    command2 = "docker exec -d "+name_container+" sh -c \"mysql --user=\\\"root\\\" --password=\\\"temprootpass\\\" --execute=\\\"GRANT ALL PRIVILEGES ON *.* TO 'macripco'@'172.17.0.1' IDENTIFIED BY '12345';\\\"\""
+    command3= "docker exec -d "+name_container+" sh -c \"sudo /etc/init.d/mysql restart \""
+    res1=os.system(command1)
+    res2=os.system(command2)
+    res3=os.system(command3)
+
+
+    if res1==0 and res2==0 and res3==0:
+        return '200'
+    return '500'

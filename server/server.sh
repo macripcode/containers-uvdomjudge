@@ -13,6 +13,7 @@
 ./server_professor_remove_container.py &
 ./server_professor_show_logs_container.py &
 ./server_professor_get_port_3306_container.py &
+./server_professor_open_database_container.py &
 
 
 

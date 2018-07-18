@@ -13,3 +13,4 @@ chmod +x server_professor_start_container.py &
 chmod +x server_professor_remove_container.py &
 chmod +x server_professor_show_logs_container.py &
 chmod +x server_professor_get_port_3306_container.py &
+chmod +x server_professor_open_database_container.py &
