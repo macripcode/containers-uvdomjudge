@@ -19,6 +19,8 @@ def set_pass_professor(data):
 
 def on_request(ch, method, props, body):
     data = json.loads(body.decode('utf-8'))
+    print("data")
+    print(data)
     print("el lazo 4")
     response = set_pass_professor(data)
 
@@ -33,12 +35,5 @@ def on_request(ch, method, props, body):
 channel.basic_qos(prefetch_count=1)
 channel.basic_consume(on_request, queue='queue_set_admin_container')
 
-print(" [x] Awaiting RPC requests")
+print(" [x] server_set_pass_container")
 channel.start_consuming()
-
-"""
-from server import server_run_container
-
-# 201702750017M05
-
-"""

@@ -11,6 +11,9 @@ channel.queue_declare(queue='queue_open_database_container')
 
 def open_database_2(name_container):
     response = open_database(name_container)
+    print("imprimiendo response")
+    print(response)
+    print("llamando a odb")
     return response
 
 
@@ -30,5 +33,5 @@ def on_request(ch, method, props, body):
 channel.basic_qos(prefetch_count=1)
 channel.basic_consume(on_request, queue='queue_open_database_container')
 
-print(" [x] Awaiting RPC requests")
+print(" [x] server_professor_open_database_container")
 channel.start_consuming()

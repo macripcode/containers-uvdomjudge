@@ -31,10 +31,5 @@ def on_request(ch, method, props, body):
 channel.basic_qos(prefetch_count=1)
 channel.basic_consume(on_request, queue='queue_enroll_student')
 
-print(" [x] Awaiting RPC requests")
+print(" [x] server_enroll_student")
 channel.start_consuming()
-
-"""
-from server import server_run_container
-
-"""

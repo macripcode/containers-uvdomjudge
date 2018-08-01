@@ -2,6 +2,7 @@
 import pika
 import json
 from functions import run_container_course
+import pdb
 
 connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
 channel = connection.channel()
@@ -31,5 +32,5 @@ def on_request(ch, method, props, body):
 channel.basic_qos(prefetch_count=1)
 channel.basic_consume(on_request, queue='queue_run_container')
 
-print(" [x] Awaiting RPC requests")
+print(" [x] server_professor_run_container")
 channel.start_consuming()

@@ -5,10 +5,6 @@ import MySQLdb
 import pdb
 from subprocess import Popen, PIPE
 import shlex
-import docker
-from docker.types import Mount
-
-client = docker.DockerClient(base_url='unix://var/run/docker.sock')
 
 #Cheeck de current port 80 from a running container
 def get_port_80(name_container):
@@ -29,44 +25,37 @@ def get_port_3306(name_container):
 
 #Stop container with name_container
 def stop_container(name_container):
-    try:
-        container= client.containers.get(name_container)
-        container.stop()
-    except 	docker.errors.APIError:
-        return '500'
-
-    return '200'
-
+    response = os.popen(
+        'docker stop ' + name_container).read().replace(
+        '\n', '')
+    if response == name_container:
+        return '200'
+    return '500'
+#hasta aqui ya hice el server
 
 #Start container with name_container
 def start_container(name_container):
-    try:
-        container= client.containers.get(name_container)
-        container.start()
-    except 	docker.errors.APIError:
-        return '500'
-
-    return '200'
+    response = os.popen(
+        'docker start ' + name_container).read().replace(
+        '\n', '')
+    if response == name_container:
+        return '200'
+    return '500'
 
 #Remove container with name_container
 def remove_container(name_container):
-    try:
-        container= client.containers.get(name_container)
-        container.remove()
-    except 	docker.errors.APIError:
-        return '500'
-
-    return '200'
+    response = os.popen(
+        'docker rm ' + name_container).read().replace(
+        '\n', '')
+    os.system("docker volume rm "+name_container+"_backup_db")
+    if response == name_container:
+        return '200'
+    return '500'
 
 #Return logs from container with name_container
 def logs_container(name_container):
-    response =""
-    try:
-        container= client.containers.get(name_container)
-        response = container.logs().decode('utf8')
-    except 	docker.errors.APIError:
-        return '500'
-
+    response = os.popen(
+        'docker logs ' + name_container).read()
     return response
 
 #Check if the container with name_container is actually up
@@ -77,27 +66,21 @@ def is_running_container(name_container):
 
 #this create a container and execute
 def run_container_course(container):
+    print("dato de container")
+    print(type(container))
+    print(container)
 
     id_course = container['id_course']
     image =  container['image']
     name_vol_container = container['name_vol_container']
 
-    command1 = "sed -i '/bind/s/^/#/g' /etc/mysql/my.cnf"
-    command2 = "mysql --user=\"root\" --password=\"temprootpass\" --execute=\"GRANT ALL PRIVILEGES ON *.* TO 'macripco'@'172.17.0.1' IDENTIFIED BY '12345';\""
-    command3 = "mysql --user=\"root\" --password=\"temprootpass\" --execute=\"GRANT ALL PRIVILEGES ON *.* TO 'macripco'@'localhost' IDENTIFIED BY '12345';\""
-    command4 = "sudo /etc/init.d/mysql restart"
 
-    try:
-        container = client.containers.run(image,command=(command1,command2,command3,command4),detach=True,name=id_course,ports={'3306/tcp': None, '80/tcp': None},mounts=[Mount("/var/lib/mysql",name_vol_container,type='volume')])
-        return '200'
 
-    except docker.errors.ImageNotFound:
-        return '500'
-    except docker.errors.ContainerError:
-        return '500'
-    except docker.errors.APIError:
-        return '500'
 
+
+    response = os.system(instruction)
+
+    return response
 
 #get the data of container
 def data_container(name_container):
@@ -232,23 +215,33 @@ def delete_containers_period(id_period):
 
 
 def open_database(name_container):
+    #pdb.set_trace()
 
-    client1 = docker.DockerClient(base_url='unix://var/run/docker.sock')
-    container = client1.containers.get(name_container)
+    user='root'
+    password='temprootpass'
+    host='localhost'
+    db='domjudge'
 
-    command1 = "sed -i '/bind/s/^/#/g' /etc/mysql/my.cnf"
-    command2 = "mysql --user=\"root\" --password=\"temprootpass\" --execute=\"GRANT ALL PRIVILEGES ON *.* TO 'macripco'@'172.17.0.1' IDENTIFIED BY '12345';\""
-    command3 = "mysql --user=\"root\" --password=\"temprootpass\" --execute=\"GRANT ALL PRIVILEGES ON *.* TO 'macripco'@'localhost' IDENTIFIED BY '12345';\""
-    command4= "sudo /etc/init.d/mysql restart"
+    command1 = "docker exec -d "+name_container+" sh -c \"sed -i '/bind/s/^/#/g' /etc/mysql/my.cnf\""
+    command2 = "docker exec -d "+name_container+" sh -c \"mysql --user=\\\"root\\\" --password=\\\"temprootpass\\\" --execute=\\\"GRANT ALL PRIVILEGES ON *.* TO 'macripco'@'172.17.0.1' IDENTIFIED BY '12345';\\\"\""
+    command3 = "docker exec -d "+name_container+" sh -c \"mysql --user=\\\"root\\\" --password=\\\"temprootpass\\\" --execute=\\\"GRANT ALL PRIVILEGES ON *.* TO 'macripco'@'localhost' IDENTIFIED BY '12345';\\\"\""
+    command4= "docker exec -d "+name_container+" sh -c \"sudo /etc/init.d/mysql restart \""
 
-    try:
+    args1 = shlex.split(command1)
+    args2 = shlex.split(command2)
+    args3 = shlex.split(command3)
+    args4 = shlex.split(command4)
 
-        container.exec_run(command1,detach=False,stream=True,stderr=True, stdout=True)
-        container.exec_run(command2,detach=False,stream=True,stderr=True, stdout=True)
-        container.exec_run(command3,detach=False,stream=True,stderr=True, stdout=True)
-        container.exec_run(command4,detach=False,stream=True,stderr=True, stdout=True)
+    response1 = Popen(args1, stdout=PIPE, stderr=PIPE)
+    res1 = response1.wait()
+    response2 = Popen(args2, stdout=PIPE, stderr=PIPE)
+    res2 = response2.wait()
+    response3 = Popen(args3, stdout=PIPE, stderr=PIPE)
+    res3 = response3.wait()
+    response4 = Popen(args4, stdout=PIPE, stderr=PIPE)
+    res4 = response4.wait()
 
+    if res1 == 0 and res2 == 0 and res3 == 0 and res4 == 0:
         return '200'
-
-    except docker.errors.APIError:
+    else:
         return '500'
