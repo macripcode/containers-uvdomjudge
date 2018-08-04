@@ -14,6 +14,7 @@
 ./server_public_run_container.py &
 ./server_set_pass_container.py &
 ./server_professor_open_database_container.py &
+./server_professor_get_data_contest_container.py &
 
 
 
