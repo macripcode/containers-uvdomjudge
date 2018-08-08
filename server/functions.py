@@ -247,20 +247,14 @@ def open_database(name_container):
 
 
 def get_data_contest_container(name_container):
-
     host = '127.0.0.1'
     usuario_bd = 'macripco'
     pass_usuario_db = '12345'
     port = int(get_port_3306(name_container))
-
     data = {}
 
     try:
-
         conn = MySQLdb.connect(host=host, port=port, user=usuario_bd, passwd=pass_usuario_db, db='domjudge')
-
-        data = {}
-
         # Details
         data['contests'] = []
         # -------Adding all contest---->
@@ -327,8 +321,41 @@ def get_data_contest_container(name_container):
                 row1 = cur1.fetchone()
             cur1.close()
             row = cur.fetchone()
-
         cur.close()
+
+        # --------Getting evaluations---------------->
+        data['evaluation'] = []
+        for contest in data['contests']:
+            for problem in contest[3]:
+                cur = conn.cursor()
+                cur.execute("select teamid, name from team where categoryid = 3 order by name;")
+                row = cur.fetchone()
+                eval = []
+                while row is not None:
+                    cur1 = conn.cursor()
+                    res = cur1.execute("select scorecache_jury.cid, \
+                                                       scorecache_jury.probid,\
+                                                       scorecache_jury.teamid, \
+                                                       team.name, \
+                                                       scorecache_jury.is_correct \
+                                                from scorecache_jury, \
+                                                     team \
+                                                where scorecache_jury.cid = " + str(contest[0]) + " and \
+                                                scorecache_jury.probid = " + str(problem[0]) + " and \
+                                                scorecache_jury.teamid = " + str(row[0]) + " and \
+                                                scorecache_jury.teamid = team.teamid")
+                    if res == 0:
+                        eval.append((row[0], row[1], 0))
+                    else:
+                        row1 = cur1.fetchone()
+                        if row1[4] == 0:
+                            eval.append((row[0], row[1], 0))
+                        elif row1[4] == 1:
+                            eval.append((row[0], row[1], 5))
+                    row = cur.fetchone()
+                data['evaluation'].append((contest[0], problem[0], eval))
+
+        #-----Adding evaluations
         conn.commit()
         conn.close()
 
@@ -340,6 +367,7 @@ def get_data_contest_container(name_container):
 
     data_str = json.dumps(data)
     data_enc = data_str.encode('utf-8')
+
     return data_enc
 
 
