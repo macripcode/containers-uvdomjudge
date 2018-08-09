@@ -323,6 +323,18 @@ def get_data_contest_container(name_container):
             row = cur.fetchone()
         cur.close()
 
+        # --------Getting list of student---------------->
+        # list
+        data['list'] = []
+        cur = conn.cursor()
+        cur.execute("select teamid, name from team where categoryid = 3 order by name;")
+        row = cur.fetchone()
+        while row is not None:
+            data['list'].append((row[0], row[1]))
+            row = cur.fetchone()
+        cur.close()
+        # --------Getting list of students---------------->
+
         # --------Getting evaluations---------------->
         data['evaluation'] = []
         for contest in data['contests']:
@@ -345,13 +357,13 @@ def get_data_contest_container(name_container):
                                                 scorecache_jury.teamid = " + str(row[0]) + " and \
                                                 scorecache_jury.teamid = team.teamid")
                     if res == 0:
-                        eval.append((row[0], row[1], 0))
+                        eval.append(0)
                     else:
                         row1 = cur1.fetchone()
                         if row1[4] == 0:
-                            eval.append((row[0], row[1], 0))
+                            eval.append(0)
                         elif row1[4] == 1:
-                            eval.append((row[0], row[1], 5))
+                            eval.append(5)
                     row = cur.fetchone()
                 data['evaluation'].append((contest[0], problem[0], eval))
 
