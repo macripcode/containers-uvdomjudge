@@ -53,6 +53,7 @@ def remove_container(name_container):
     try:
         container= client.containers.get(name_container)
         container.remove()
+        os.system("docker volume rm " + name_container + "_backup_db")
     except 	docker.errors.APIError:
         return '500'
 
